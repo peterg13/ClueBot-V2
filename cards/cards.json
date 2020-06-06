@@ -1,0 +1,72 @@
+{
+    "suspects" : [
+        {
+            "name" : "mrs. white"
+        },
+        {
+            "name" : "mrs. peacock"
+        },
+        {
+            "name" : "miss scarlet"
+        },
+        {
+            "name" : "colonel mustard"
+        },
+        {
+            "name" : "mr. green"
+        },
+        {
+            "name" : "professor plum"
+        }
+    ],
+    "weapons" : [
+        {
+            "name" : "candlestick"
+        },
+        {
+            "name" : "revolver"
+        },
+        {
+            "name" : "rope"
+        },
+        {
+            "name" : "wrench"
+        },
+        {
+            "name" : "leadpipe"
+        },
+        {
+            "name" : "knife"
+        }
+
+    ],
+    "rooms" : [
+        {
+            "name" : "study"
+        },
+        {
+            "name" : "library"
+        },
+        {
+            "name" : "conservatory"
+        },
+        {
+            "name" : "hall"
+        },
+        {
+            "name" : "kitchen"
+        },
+        {
+            "name" : "ballroom"
+        },
+        {
+            "name" : "dining room"
+        },
+        {
+            "name" : "lounge"
+        },
+        {
+            "name" : "billiard room"
+        }
+    ]
+}
