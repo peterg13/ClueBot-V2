@@ -49,20 +49,25 @@ class MainApp(tk.Tk):
         resultsFrame = tk.Frame(root, bg="black", borderwidth = 1, relief = "groove")
         resultsFrame.pack(side = tk.BOTTOM)
 
+        textSide = tk.LEFT
+
         suspectList = tk.Listbox(resultsFrame)
-        suspectList.pack(side = tk.LEFT)
+        suspectList.pack(side = textSide)
         for suspect in suspects:
-            suspectList.insert(tk.END, suspect.getName())
+            text = suspect.getName() + " - " + str(suspect.getChance()) + '%'
+            suspectList.insert(tk.END, text)
 
         weaponList = tk.Listbox(resultsFrame)
-        weaponList.pack(side = tk.LEFT)
+        weaponList.pack(side = textSide)
         for weapon in weapons:
-            weaponList.insert(tk.END, weapon.getName())
+            text = weapon.getName() + " - " + str(weapon.getChance()) + '%'
+            weaponList.insert(tk.END, text)
 
         roomList = tk.Listbox(resultsFrame)
-        roomList.pack(side = tk.LEFT)
+        roomList.pack(side = textSide)
         for room in rooms:
-            roomList.insert(tk.END, room.getName())
+            text = room.getName() + " - " + str(room.getChance()) + '%'
+            roomList.insert(tk.END, text)
 
     def removeFunction(self):
             pass

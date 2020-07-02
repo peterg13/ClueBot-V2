@@ -15,5 +15,18 @@ def loadCards():
         weaponCards.append(Card(weapon["name"]))
     for room in data["rooms"]:
         roomCards.append(Card(room["name"]))
+
+    suspectChance = int(100 / len(suspectCards))
+    weaponChance = int(100 / len(weaponCards))
+    roomChance = int(100 / len(roomCards))
+
+    for suspect in suspectCards:
+        suspect.setChance(suspectChance)
+
+    for weapon in weaponCards:
+        weapon.setChance(weaponChance)
+
+    for room in roomCards:
+        room.setChance(roomChance)
     
     return suspectCards, weaponCards, roomCards
