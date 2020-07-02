@@ -73,7 +73,8 @@ class MainApp(tk.Tk):
         for room in rooms:
             text = room.getName() + " - " + str(room.getChance()) + '%'
             roomList.insert(tk.END, text)
-
+            
+    #TODO: find some way to allow this function to also edit the gui.  Maybe pass it in as a parameter?
     def removeFunction(self, suspectVar, weaponVar, roomVar):
         global suspects, weapons, rooms
         for i in range(len(suspects)):
