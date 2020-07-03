@@ -3,27 +3,22 @@ from cards import card_handler
 
 class MainApp(tk.Tk):
 
-    global suspects, weapons, rooms = [], [], []
-
     def __init__(self):
         tk.Tk.__init__(self)
         #this line is so we can use root as the base frame to easier understand the frame layouts
         root = self
-        global suspects, weapons, rooms = card_handler.loadCards()
+        suspects, weapons, rooms = card_handler.loadCards()
 
         #Frame that holds the suspects, weapons and rooms ----------------
         swrFrameBG = "black"
         swrFrame = tk.Frame(root, bg=swrFrameBG, borderwidth = 5, relief = "solid")
         swrFrame.pack()
 
-        suspectVar, weaponVar, roomVar = tk.StringVar(), tk.StringVar(), tk.StringVar()
-
         #button to remove the selected options
-        removeButton = tk.Button(swrFrame, text="remove", command = self.removeFunction(suspectVar, weaponVar, roomVar))
-        removeButton.pack(side=tk.BOTTOM, fill="x")
+        tk.Button(swrFrame, text="remove", command = self.removeFunction).pack(side=tk.BOTTOM, fill="x")
 
         #suspect section
-        #suspectVar = tk.StringVar()
+        suspectVar = tk.StringVar()
         suspectBG = "#8bf7ec"
         suspectFrame = tk.Frame(swrFrame, bg=swrFrameBG, borderwidth = 1, relief = "groove")
         suspectFrame.pack(side = tk.LEFT, fill="y")
@@ -31,7 +26,7 @@ class MainApp(tk.Tk):
             tk.Radiobutton(suspectFrame, text = suspect.getName(), variable = suspectVar, value = suspect.getName(), bg=suspectBG, indicatoron = 0).pack(fill="x")
 
         #weapon section
-        #weaponVar = tk.StringVar()
+        weaponVar = tk.StringVar()
         weaponsBG = "#e18bf7"
         weaponFrame = tk.Frame(swrFrame, bg=swrFrameBG, borderwidth = 1, relief = "groove")
         weaponFrame.pack(side = tk.LEFT, fill="y")
@@ -40,7 +35,7 @@ class MainApp(tk.Tk):
 
 
         #room section
-        #roomVar = tk.StringVar()
+        roomVar = tk.StringVar()
         roomBG = "#bcf78b"
         roomFrame = tk.Frame(swrFrame, bg=swrFrameBG, borderwidth = 1, relief = "groove")
         roomFrame.pack(side = tk.LEFT, fill="y")
@@ -73,14 +68,21 @@ class MainApp(tk.Tk):
         for room in rooms:
             text = room.getName() + " - " + str(room.getChance()) + '%'
             roomList.insert(tk.END, text)
-            
-    #TODO: find some way to allow this function to also edit the gui.  Maybe pass it in as a parameter?
-    def removeFunction(self, suspectVar, weaponVar, roomVar):
-        global suspects, weapons, rooms
-        for i in range(len(suspects)):
-            if suspects[i].getName() == suspectVar.get():
-                suspects.pop(i)
+
+    def removeFunction(self):
+            pass
 
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
+
+
+#TODO: find some way to allow this function to also edit the gui.  Maybe pass it in as a parameter?
+    #def removeFunction(self, suspectVar, weaponVar, roomVar):
+        #global suspects, weapons, rooms
+        #for i in range(len(suspects)):
+            #if suspects[i].getName() == suspectVar.get():
+                #suspects.pop(i)
+
+
+#suspects, weapons, rooms = card_handler.loadCards()
