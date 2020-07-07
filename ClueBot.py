@@ -44,39 +44,23 @@ class MainApp(tk.Tk):
             "roomFrame" : roomFrame
         }
         
+        #creates the radiobutton GUI
         self.updateRadioButtons()
 
         #------------------------------------------------------------------------------------------------------------
 
         #Frame that will show the possible winning cards along with their percentage for being a winning card
-        resultsFrame = tk.Frame(root, bg="black", borderwidth = 1, relief = "groove")
-        resultsFrame.pack(side = tk.BOTTOM)
+        self.resultsFrame = tk.Frame(root, bg="black", borderwidth = 1, relief = "groove")
+        self.resultsFrame.pack(side = tk.BOTTOM)
 
-        #side they will align with. Using variable for easy changing later on
-        textSide = tk.LEFT
+        #creates the ListBoxes GUI that shows the winning cards
+        self.updateWinningLists()
 
-        suspectList = tk.Listbox(resultsFrame)
-        suspectList.pack(side = textSide)
-        for suspect in self.suspects:
-            text = suspect.getName() + " - " + str(suspect.getChance()) + '%'
-            suspectList.insert(tk.END, text)
-
-        weaponList = tk.Listbox(resultsFrame)
-        weaponList.pack(side = textSide)
-        for weapon in self.weapons:
-            text = weapon.getName() + " - " + str(weapon.getChance()) + '%'
-            weaponList.insert(tk.END, text)
-
-        roomList = tk.Listbox(resultsFrame)
-        roomList.pack(side = textSide)
-        for room in self.rooms:
-            text = room.getName() + " - " + str(room.getChance()) + '%'
-            roomList.insert(tk.END, text)
 
     #function that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
     def removeFunction(self):
-        #the following 3 loops will go through the three lists of cards and remove them.
+        #the following 3 loops will go through the three lists of cards and remove them from the radio buttons.
         for i in range(len(self.suspects)):
             if self.suspects[i].getName() == self.rbVars["suspectVar"].get():
                 self.destroyRadioButton("suspect", self.suspects[i].getName())
@@ -93,7 +77,10 @@ class MainApp(tk.Tk):
                 self.rooms.pop(i)
                 break
 
-        #TODO: update the lists
+        #TODO: update the lists and %
+        self.destroyWinningLists()
+        self.updateCardWinningChance()
+        self.updateWinningLists()
         
     #given the name of the card this fucntion finds the radio button with the same name and removes it from the GUI
     def destroyRadioButton(self, cardType, cardName):
@@ -113,6 +100,7 @@ class MainApp(tk.Tk):
                     child.destroy()
                     break
 
+    #method to display the radio buttons.  creating a seperate method to help clearn up code a bit.
     def updateRadioButtons(self):
         #selection colors
         suspectBG = "#8bf7ec"
@@ -128,10 +116,50 @@ class MainApp(tk.Tk):
         for room in self.rooms:
             tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=roomBG, indicatoron = 0).pack(fill="x")
 
-        
+    def updateWinningLists(self):
+        #side they will align with. Using variable for easy changing later on
+        textSide = tk.LEFT
 
-    def updateListBoxes(self):
-        pass
+        #the following 3 sections will create the list, loop through teh cards and add the text
+        suspectList = tk.Listbox(self.resultsFrame)
+        suspectList.pack(side = textSide)
+        for suspect in self.suspects:
+            text = suspect.getName() + " - " + str(suspect.getChance()) + '%'
+            suspectList.insert(tk.END, text)
+
+        weaponList = tk.Listbox(self.resultsFrame)
+        weaponList.pack(side = textSide)
+        for weapon in self.weapons:
+            text = weapon.getName() + " - " + str(weapon.getChance()) + '%'
+            weaponList.insert(tk.END, text)
+
+        roomList = tk.Listbox(self.resultsFrame)
+        roomList.pack(side = textSide)
+        for room in self.rooms:
+            text = room.getName() + " - " + str(room.getChance()) + '%'
+            roomList.insert(tk.END, text)
+
+    #simple method to clear the lists before we add the updated ones back
+    def destroyWinningLists(self):
+        for child in self.resultsFrame.winfo_children():
+            child.destroy()
+
+    #simple method to loop through each remaining card and update their win %
+    def updateCardWinningChance(self):
+        suspectSize = len(self.suspects)
+        weaponSize = len(self.weapons)
+        roomSize = len(self.rooms)
+
+        for i in range(suspectSize):
+            self.suspects[i].setChance(int(100 / suspectSize))
+
+        for i in range(weaponSize):
+            self.weapons[i].setChance(int(100 / weaponSize))
+
+        for i in range(roomSize):
+            self.rooms[i].setChance(int(100 / roomSize))
+
+
 
 if __name__ == "__main__":
     app = MainApp()
