@@ -14,7 +14,7 @@ class MainApp(tk.Tk):
 
         #Frame that holds the suspects, weapons and rooms ----------------
         swrFrameBG = "#292929"
-        swrFrame = tk.Frame(root, bg=swrFrameBG)
+        swrFrame = tk.Frame(root, bg=swrFrameBG, borderwidth = 5, relief = "solid")
         swrFrame.pack()
 
         #variables that get passed to the remove button.  These variables hold the current radio button selection.  
@@ -27,7 +27,7 @@ class MainApp(tk.Tk):
         }
 
         #button to remove the selected options
-        tk.Button(swrFrame, text="remove", command = lambda : self.removeFunction(), bg="#b3b3b3").pack(side=tk.BOTTOM, fill="x")
+        tk.Button(swrFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.BOTTOM, pady=5, fill="x", padx=1)
 
         #suspect section
         suspectFrame = tk.Frame(swrFrame, bg=swrFrameBG)
@@ -107,27 +107,28 @@ class MainApp(tk.Tk):
     #also adds a label above each section to function as a title
     def updateRadioButtons(self):
         #selection colors
-        buttonColor = "#ff5c87"
-        selectColor = "#ffadbf"
+        buttonColor = "#bcc8c9"
+        selectColor = "#c9c0bc"
 
         font = "Helvetica"
-        fontSize = 15
+        fontSize = 20
 
-        labelBG = "#d9c3c3"
+        labelBG = "#82acb0"
         labelFont = "Helvetica"
-        labelFontSize = 20
+        labelFontSize = 25
         labelWidth = 15
-        labelPadding = 3
+        labelXPadding = 2
+        labelYPadding = 5
 
-        tk.Label(self.rbFrames["suspectFrame"], text = "Suspects", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelPadding, padx=labelPadding)
+        tk.Label(self.rbFrames["suspectFrame"], text = "Suspects", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
         for suspect in self.suspects:
             tk.Radiobutton(self.rbFrames["suspectFrame"], text = suspect.getName(), variable = self.rbVars["suspectVar"], value = suspect.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
         
-        tk.Label(self.rbFrames["weaponFrame"], text = "Weapons", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelPadding, padx=labelPadding)
+        tk.Label(self.rbFrames["weaponFrame"], text = "Weapons", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
         for weapon in self.weapons:
             tk.Radiobutton(self.rbFrames["weaponFrame"], text = weapon.getName(), variable = self.rbVars["weaponVar"], value = weapon.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
 
-        tk.Label(self.rbFrames["roomFrame"], text = "Rooms", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelPadding, padx=labelPadding)
+        tk.Label(self.rbFrames["roomFrame"], text = "Rooms", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
         for room in self.rooms:
             tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
 
