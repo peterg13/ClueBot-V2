@@ -15,7 +15,7 @@ class MainApp(tk.Tk):
         #Frame that holds the suspects, weapons and rooms ----------------
         swrFrameBG = "#292929"
         swrFrame = tk.Frame(root, bg=swrFrameBG, borderwidth = 5, relief = "solid")
-        swrFrame.pack()
+        swrFrame.pack(side = tk.TOP)
 
         #variables that get passed to the remove button.  These variables hold the current radio button selection.  
         #Need to declare before the button so it has access to these variables and need to declare the remove button
@@ -51,13 +51,24 @@ class MainApp(tk.Tk):
         self.updateRadioButtons()
 
         #------------------------------------------------------------------------------------------------------------
+        #this section is for the players
+        self.playersFrame = tk.Frame(root, bg="#292929", borderwidth = 1, relief = "solid")
+        self.playersFrame.pack(side=tk.TOP, pady=5)
+
+        testFrame = tk.Label(self.playersFrame, text="test", width="50")
+        testFrame.pack(side=tk.TOP)
+
+
+        #------------------------------------------------------------------------------------------------------------
 
         #Frame that will show the possible winning cards along with their percentage for being a winning card
-        self.resultsFrame = tk.Frame(root, bg="black", borderwidth = 1, relief = "groove")
-        self.resultsFrame.pack(side = tk.BOTTOM)
+        self.resultsFrame = tk.Frame(root, bg="#292929", borderwidth = 5, relief = "solid")
+        self.resultsFrame.pack(side = tk.TOP)
 
         #creates the ListBoxes GUI that shows the winning cards
         self.updateWinningLists()
+
+        
 
 
     #function that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
@@ -135,24 +146,28 @@ class MainApp(tk.Tk):
     def updateWinningLists(self):
         #side they will align with. Using variable for easy changing later on
         textSide = tk.LEFT
+        textFont = "Helvetica"
+        textSize = 20
+        frameBG = "#292929"
+        textColor = "#bcc8c9"
 
         #the following 3 sections will create the list, loop through teh cards and add the text
-        suspectList = tk.Listbox(self.resultsFrame)
+        suspectList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
         suspectList.pack(side = textSide)
         for suspect in self.suspects:
-            text = suspect.getName() + " - " + str(suspect.getChance()) + '%'
+            text = str(suspect.getChance()) + "% - " + suspect.getName()
             suspectList.insert(tk.END, text)
 
-        weaponList = tk.Listbox(self.resultsFrame)
+        weaponList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
         weaponList.pack(side = textSide)
         for weapon in self.weapons:
-            text = weapon.getName() + " - " + str(weapon.getChance()) + '%'
+            text = str(weapon.getChance()) + "% - " + weapon.getName()
             weaponList.insert(tk.END, text)
 
-        roomList = tk.Listbox(self.resultsFrame)
+        roomList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
         roomList.pack(side = textSide)
         for room in self.rooms:
-            text = room.getName() + " - " + str(room.getChance()) + '%'
+            text = str(room.getChance()) + "% - " + room.getName()
             roomList.insert(tk.END, text)
 
     #simple method to clear the lists before we add the updated ones back
