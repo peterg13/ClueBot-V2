@@ -10,7 +10,8 @@ class MainApp(tk.Tk):
         root.config(bg='#292929')
         root.title("ClueBot - V2")
 
-        self.suspects, self.weapons, self.rooms= card_handler.loadCards()
+        self.initCards()
+        self.initPlayers()
 
         #Frame that holds the suspects, weapons and rooms ----------------
         swrFrameBG = "#292929"
@@ -55,8 +56,8 @@ class MainApp(tk.Tk):
         self.playersFrame = tk.Frame(root, bg="#292929", borderwidth = 1, relief = "solid")
         self.playersFrame.pack(side=tk.TOP, pady=5)
 
-        testFrame = tk.Label(self.playersFrame, text="test", width="50")
-        testFrame.pack(side=tk.TOP)
+        self.updatePlayers()
+
 
 
         #------------------------------------------------------------------------------------------------------------
@@ -71,7 +72,7 @@ class MainApp(tk.Tk):
         
 
 
-    #function that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
+    #method that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
     def removeFunction(self):
         #the following 3 loops will go through the three lists of cards and remove them from the radio buttons.
@@ -143,6 +144,27 @@ class MainApp(tk.Tk):
         for room in self.rooms:
             tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
 
+    #main source for the player GUI.  Creates a set of frames for each player and displays their possible cards
+    def updatePlayers(self):
+        labelFont = "Helvetica"
+        labelFontSize = 25
+        listFont = "Helvetica"
+        listFontSize = 15
+
+        #this loop will go through each player added to the game
+        #first it creates a new frame for each player and in the frame creates a label for their name and a list of the cards associated with the player
+        for player in self.players:
+            playerFrame = tk.Frame(self.playersFrame, borderwidth = 3, relief = "solid")
+            playerFrame.pack(side = tk.LEFT)
+
+            tk.Label(playerFrame, bg="red", text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP)
+            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize))
+            playerCardList.pack(side = tk.TOP)
+            for card in player.getCards():
+                text = card.getName() + " - " + str(card.getOccurrence())
+                playerCardList.insert(tk.END, text)
+
+
     def updateWinningLists(self):
         #side they will align with. Using variable for easy changing later on
         textSide = tk.LEFT
@@ -190,18 +212,16 @@ class MainApp(tk.Tk):
         for i in range(roomSize):
             self.rooms[i].setChance(int(100 / roomSize))
 
+    #basic init to create the global variables for the three sets of cards
+    def initCards(self):
+        self.suspects, self.weapons, self.rooms= card_handler.loadCards()
+
+    #basic init to create all of the player classes of people playing the game
+    def initPlayers(self):
+        self.players = card_handler.initPlayers()
 
 
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
 
-
-
-
-#color pallet
-#dark blue - #173f5f
-#blue      - #20639b
-#teal      - #3caea3
-#yellow    - #f6d55c
-#red       - #ed553b
