@@ -13,4 +13,12 @@ class Player:
         return self.cards
     
     def addCard(self, cardName):
-        self.cards.append(Card(cardName))
+        if len(self.getCards()) == 0:
+            newCard = Card(cardName)
+            newCard.incrementOccurrence()
+            self.cards.append(newCard)
+        else:
+            for card in self.getCards():
+                if card.getName() == cardName:
+                    card.incrementOccurrence()
+                    break

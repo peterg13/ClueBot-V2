@@ -5,17 +5,20 @@ class MainApp(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
+
+        #main bg color for the whole app
+        self.mainAppBgColor = "#292929"
+
         #this line is so we can use root as the base frame to easier understand the frame layouts
         root = self
-        root.config(bg='#292929')
+        root.config(bg=self.mainAppBgColor)
         root.title("ClueBot - V2")
 
         self.initCards()
         self.initPlayers()
 
         #Frame that holds the suspects, weapons and rooms ----------------
-        swrFrameBG = "#292929"
-        swrFrame = tk.Frame(root, bg=swrFrameBG, borderwidth = 5, relief = "solid")
+        swrFrame = tk.Frame(root, bg=self.mainAppBgColor, borderwidth = 5, relief = "solid")
         swrFrame.pack(side = tk.TOP)
 
         #variables that get passed to the remove button.  These variables hold the current radio button selection.  
@@ -24,36 +27,43 @@ class MainApp(tk.Tk):
         self.rbVars = {
             "suspectVar" : tk.StringVar(),
             "weaponVar" : tk.StringVar(),
-            "roomVar" : tk.StringVar()
+            "roomVar" : tk.StringVar(),
+            "playerVar" : tk.StringVar()
         }
 
         #button to remove the selected options
         tk.Button(swrFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.BOTTOM, pady=5, fill="x", padx=1)
-
+        tk.Button(swrFrame, text="Add To Player", command = lambda : self.addToPlayer()).pack()
         #suspect section
-        suspectFrame = tk.Frame(swrFrame, bg=swrFrameBG)
+        suspectFrame = tk.Frame(swrFrame, bg=self.mainAppBgColor)
         suspectFrame.pack(side = tk.LEFT, fill="y", padx=1)
 
         #weapon section        
-        weaponFrame = tk.Frame(swrFrame, bg=swrFrameBG)
+        weaponFrame = tk.Frame(swrFrame, bg=self.mainAppBgColor)
         weaponFrame.pack(side = tk.LEFT, fill="y", padx=1)
         
         #room section        
-        roomFrame = tk.Frame(swrFrame, bg=swrFrameBG)
+        roomFrame = tk.Frame(swrFrame, bg=self.mainAppBgColor)
         roomFrame.pack(side = tk.LEFT, fill="y", padx=1)
+
+        #player section        
+        playerFrame = tk.Frame(swrFrame, bg=self.mainAppBgColor)
+        playerFrame.pack(side = tk.LEFT, fill="y", padx=1)
 
         self.rbFrames = {
             "suspectFrame" : suspectFrame,
             "weaponFrame" : weaponFrame,
-            "roomFrame" : roomFrame
+            "roomFrame" : roomFrame,
+            "playerFrame" : playerFrame
         }
         
         #creates the radiobutton GUI
         self.updateRadioButtons()
+        self.updatePlayerCheckboxes()
 
         #------------------------------------------------------------------------------------------------------------
         #this section is for the players
-        self.playersFrame = tk.Frame(root, bg="#292929", borderwidth = 1, relief = "solid")
+        self.playersFrame = tk.Frame(root, bg=self.mainAppBgColor, borderwidth = 1, relief = "solid")
         self.playersFrame.pack(side=tk.TOP, pady=5)
 
         self.updatePlayers()
@@ -63,7 +73,7 @@ class MainApp(tk.Tk):
         #------------------------------------------------------------------------------------------------------------
 
         #Frame that will show the possible winning cards along with their percentage for being a winning card
-        self.resultsFrame = tk.Frame(root, bg="#292929", borderwidth = 5, relief = "solid")
+        self.resultsFrame = tk.Frame(root, bg=self.mainAppBgColor, borderwidth = 5, relief = "solid")
         self.resultsFrame.pack(side = tk.TOP)
 
         #creates the ListBoxes GUI that shows the winning cards
@@ -144,12 +154,31 @@ class MainApp(tk.Tk):
         for room in self.rooms:
             tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
 
+        
+
+    def updatePlayerCheckboxes(self):
+        labelBG = "#82acb0"
+        labelFont = "Helvetica"
+        labelFontSize = 25
+        labelWidth = 15
+        labelXPadding = 2
+        labelYPadding = 5
+
+        tk.Label(self.rbFrames["playerFrame"], text = "Players", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
+        for player in self.players:
+            tk.Checkbutton(self.rbFrames["playerFrame"], text = player.getName(), variable = self.playerVars[player.getName()]).pack(fill = "x")
+
+    #TODO: right now player only seems to get 1 card added.
     #main source for the player GUI.  Creates a set of frames for each player and displays their possible cards
     def updatePlayers(self):
         labelFont = "Helvetica"
         labelFontSize = 25
+        labelBG = "#82acb0"
+
         listFont = "Helvetica"
         listFontSize = 15
+        listFontColor = "#bcc8c9"
+
 
         #this loop will go through each player added to the game
         #first it creates a new frame for each player and in the frame creates a label for their name and a list of the cards associated with the player
@@ -157,12 +186,31 @@ class MainApp(tk.Tk):
             playerFrame = tk.Frame(self.playersFrame, borderwidth = 3, relief = "solid")
             playerFrame.pack(side = tk.LEFT)
 
-            tk.Label(playerFrame, bg="red", text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP)
-            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize))
+            tk.Label(playerFrame, bg=labelBG, text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP, fill="x")
+            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor)
             playerCardList.pack(side = tk.TOP)
             for card in player.getCards():
                 text = card.getName() + " - " + str(card.getOccurrence())
                 playerCardList.insert(tk.END, text)
+
+    def destroyPlayers(self):
+        for child in self.playersFrame.winfo_children():
+            child.destroy()
+
+    def addToPlayer(self):
+        suspectCard = self.rbVars["suspectVar"].get()
+        weaponCard = self.rbVars["weaponVar"].get()
+        roomCard = self.rbVars["roomVar"].get()
+
+        for player in self.players:
+            if self.playerVars[player.getName()].get() == 1:
+                player.addCard(suspectCard)
+                player.addCard(weaponCard)
+                player.addCard(roomCard)
+                self.playerVars[player.getName()].set(0)
+
+        self.destroyPlayers()
+        self.updatePlayers()
 
 
     def updateWinningLists(self):
@@ -170,23 +218,22 @@ class MainApp(tk.Tk):
         textSide = tk.LEFT
         textFont = "Helvetica"
         textSize = 20
-        frameBG = "#292929"
         textColor = "#bcc8c9"
 
         #the following 3 sections will create the list, loop through teh cards and add the text
-        suspectList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
+        suspectList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=self.mainAppBgColor, fg=textColor)
         suspectList.pack(side = textSide)
         for suspect in self.suspects:
             text = str(suspect.getChance()) + "% - " + suspect.getName()
             suspectList.insert(tk.END, text)
 
-        weaponList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
+        weaponList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=self.mainAppBgColor, fg=textColor)
         weaponList.pack(side = textSide)
         for weapon in self.weapons:
             text = str(weapon.getChance()) + "% - " + weapon.getName()
             weaponList.insert(tk.END, text)
 
-        roomList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=frameBG, fg=textColor)
+        roomList = tk.Listbox(self.resultsFrame, justify=tk.LEFT, font=(textFont, textSize), bg=self.mainAppBgColor, fg=textColor)
         roomList.pack(side = textSide)
         for room in self.rooms:
             text = str(room.getChance()) + "% - " + room.getName()
@@ -219,6 +266,11 @@ class MainApp(tk.Tk):
     #basic init to create all of the player classes of people playing the game
     def initPlayers(self):
         self.players = card_handler.initPlayers()
+
+        #vars for the player checkboxes
+        self.playerVars = {}
+        for player in self.players:
+            self.playerVars[player.getName()] = tk.IntVar()
 
 
 if __name__ == "__main__":

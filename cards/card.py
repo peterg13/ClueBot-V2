@@ -15,6 +15,9 @@ class Card:
     def setChance(self, newChance):
         self.chance = newChance
 
+    def getOccurrence(self):
+        return self.occurrence
+
     def incrementOccurrence(self):
         self.occurrence += 1
 
