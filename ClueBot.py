@@ -32,8 +32,10 @@ class MainApp(tk.Tk):
         }
 
         #button to remove the selected options
-        tk.Button(swrFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.BOTTOM, pady=5, fill="x", padx=1)
-        tk.Button(swrFrame, text="Add To Player", command = lambda : self.addToPlayer()).pack()
+        self.buttonFrame = tk.Frame(root, bg=self.mainAppBgColor)
+        self.buttonFrame.pack(side=tk.TOP)
+        self.initButtons()
+
         #suspect section
         suspectFrame = tk.Frame(swrFrame, bg=self.mainAppBgColor)
         suspectFrame.pack(side = tk.LEFT, fill="y", padx=1)
@@ -79,8 +81,10 @@ class MainApp(tk.Tk):
         #creates the ListBoxes GUI that shows the winning cards
         self.updateWinningLists()
 
-        
-
+    #inits the buttons for removing radio buttons and adding cards to a player  
+    def initButtons(self):
+        tk.Button(self.buttonFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.LEFT, pady=5, padx=1)
+        tk.Button(self.buttonFrame, text="Add To Player", command = lambda : self.addToPlayer(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.LEFT, pady=5, padx=1)
 
     #method that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
@@ -152,10 +156,9 @@ class MainApp(tk.Tk):
 
         tk.Label(self.rbFrames["roomFrame"], text = "Rooms", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
         for room in self.rooms:
-            tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")
+            tk.Radiobutton(self.rbFrames["roomFrame"], text = room.getName(), variable = self.rbVars["roomVar"], value = room.getName(), bg=buttonColor, selectcolor=selectColor, indicatoron = 0, font=(font, fontSize)).pack(fill="x")  
 
-        
-
+    #method that handles the GUI for the section that shows the playuer checkboxes
     def updatePlayerCheckboxes(self):
         labelBG = "#82acb0"
         labelFont = "Helvetica"
@@ -168,7 +171,6 @@ class MainApp(tk.Tk):
         for player in self.players:
             tk.Checkbutton(self.rbFrames["playerFrame"], text = player.getName(), variable = self.playerVars[player.getName()]).pack(fill = "x")
 
-    #TODO: right now player only seems to get 1 card added.
     #main source for the player GUI.  Creates a set of frames for each player and displays their possible cards
     def updatePlayers(self):
         labelFont = "Helvetica"
@@ -193,25 +195,38 @@ class MainApp(tk.Tk):
                 text = card.getName() + " - " + str(card.getOccurrence())
                 playerCardList.insert(tk.END, text)
 
+    #removes the players lists so that we can dispaly it again with updated values
     def destroyPlayers(self):
         for child in self.playersFrame.winfo_children():
             child.destroy()
 
+    #adds the selected cards to the selected players
     def addToPlayer(self):
         suspectCard = self.rbVars["suspectVar"].get()
         weaponCard = self.rbVars["weaponVar"].get()
         roomCard = self.rbVars["roomVar"].get()
 
         for player in self.players:
-            if self.playerVars[player.getName()].get() == 1:
-                player.addCard(suspectCard)
-                player.addCard(weaponCard)
-                player.addCard(roomCard)
+            if self.playerVars[player.getName()].get() == 1:  
+                if suspectCard != "":
+                    player.addCard(suspectCard)
+                if weaponCard != "":
+                    player.addCard(weaponCard)
+                if roomCard != "":
+                    player.addCard(roomCard)
+
+                #print("suspect: %s - weapon: %s - room: %s" %(suspectCard, weaponCard, roomCard), flush = True)
                 self.playerVars[player.getName()].set(0)
+                
+                for card in player.getCards():
+                    print(card.getName() + " - " + str(card.getOccurrence()), flush=True)
+                
 
         self.destroyPlayers()
         self.updatePlayers()
 
+        for var in self.rbVars:
+            self.rbVars[var].set("")
 
     def updateWinningLists(self):
         #side they will align with. Using variable for easy changing later on
