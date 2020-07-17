@@ -79,12 +79,16 @@ class MainApp(tk.Tk):
         self.resultsFrame.pack(side = tk.TOP)
 
         #creates the ListBoxes GUI that shows the winning cards
-        self.updateWinningLists()
+        #self.updateWinningLists()
 
     #inits the buttons for removing radio buttons and adding cards to a player  
     def initButtons(self):
-        tk.Button(self.buttonFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.LEFT, pady=5, padx=1)
-        tk.Button(self.buttonFrame, text="Add To Player", command = lambda : self.addToPlayer(), bg="#707070", font=("Helvetica", 25), width = 30).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to remove a card (will color it red to indicate that it is eliminated as a possibility)
+        tk.Button(self.buttonFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 25).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to add the selected card(s) to the selected player(s)
+        tk.Button(self.buttonFrame, text="Add To Player", command = lambda : self.addToPlayer(), bg="#707070", font=("Helvetica", 25), width = 25).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to clear all selections if we need to
+        tk.Button(self.buttonFrame, text="Clear", command = lambda : self.clearSelections(), bg="#707070", font=("Helvetica", 25), width = 10).pack(side=tk.LEFT, pady=5, padx=1)
 
     #method that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
@@ -92,25 +96,46 @@ class MainApp(tk.Tk):
         #the following 3 loops will go through the three lists of cards and remove them from the radio buttons.
         for i in range(len(self.suspects)):
             if self.suspects[i].getName() == self.rbVars["suspectVar"].get():
-                self.destroyRadioButton("suspect", self.suspects[i].getName())
+                self.eliminateCard("suspect", self.suspects[i].getName())
                 self.suspects.pop(i)
                 break
         for i in range(len(self.weapons)):
             if self.weapons[i].getName() == self.rbVars["weaponVar"].get():
-                self.destroyRadioButton("weapon", self.weapons[i].getName())
+                self.eliminateCard("weapon", self.weapons[i].getName())
                 self.weapons.pop(i)
                 break
         for i in range(len(self.rooms)):
             if self.rooms[i].getName() == self.rbVars["roomVar"].get():
-                self.destroyRadioButton("room", self.rooms[i].getName())
+                self.eliminateCard("room", self.rooms[i].getName())
                 self.rooms.pop(i)
                 break
 
-        #TODO: update the lists and %
-        self.destroyWinningLists()
-        self.updateCardWinningChance()
-        self.updateWinningLists()
         
+        #self.destroyWinningLists()
+        #self.updateCardWinningChance()
+        #self.updateWinningLists()
+
+    #new function to replace the old remove.  Since we no longer want to remove a card we will instead mark it in red to represent that it is eliminated
+    def eliminateCard(self, cardType, cardName):
+        if cardType == "suspect":
+            for child in self.rbFrames["suspectFrame"].children.values():
+                if child.cget("text") == cardName:
+                    child.config(bg="#c2938e")
+                    self.rbVars["suspectVar"].set("")
+                    break
+        elif cardType == "weapon":
+            for child in self.rbFrames["weaponFrame"].children.values():
+                if child.cget("text") == cardName:
+                    child.config(bg="#c2938e")
+                    self.rbVars["weaponVar"].set("")
+                    break
+        elif cardType == "room":
+            for child in self.rbFrames["roomFrame"].children.values():
+                if child.cget("text") == cardName:
+                    child.config(bg="#c2938e")
+                    self.rbVars["roomVar"].set("")
+                    break
+
     #given the name of the card this fucntion finds the radio button with the same name and removes it from the GUI
     def destroyRadioButton(self, cardType, cardName):
         if cardType == "suspect":
@@ -166,10 +191,14 @@ class MainApp(tk.Tk):
         labelWidth = 15
         labelXPadding = 2
         labelYPadding = 5
+        checkBoxFont = "Helvetica"
+        checkBoxFontSize = 21
+        checkBoxColor = "#bcc8c9"
+        selectColor = "#c9c0bc"
 
         tk.Label(self.rbFrames["playerFrame"], text = "Players", font = (labelFont, labelFontSize, "bold"), bg = labelBG, width = labelWidth).pack(fill="x", pady=labelYPadding, padx=labelXPadding)
         for player in self.players:
-            tk.Checkbutton(self.rbFrames["playerFrame"], text = player.getName(), variable = self.playerVars[player.getName()]).pack(fill = "x")
+            tk.Checkbutton(self.rbFrames["playerFrame"], text = player.getName(), variable = self.playerVars[player.getName()], font = (checkBoxFont, checkBoxFontSize), bg = checkBoxColor, selectcolor=selectColor, indicatoron = 0).pack(fill = "x")
 
     #main source for the player GUI.  Creates a set of frames for each player and displays their possible cards
     def updatePlayers(self):
@@ -228,6 +257,7 @@ class MainApp(tk.Tk):
         for var in self.rbVars:
             self.rbVars[var].set("")
 
+    
     def updateWinningLists(self):
         #side they will align with. Using variable for easy changing later on
         textSide = tk.LEFT
@@ -253,12 +283,12 @@ class MainApp(tk.Tk):
         for room in self.rooms:
             text = str(room.getChance()) + "% - " + room.getName()
             roomList.insert(tk.END, text)
-
+    
     #simple method to clear the lists before we add the updated ones back
     def destroyWinningLists(self):
         for child in self.resultsFrame.winfo_children():
             child.destroy()
-
+    
     #simple method to loop through each remaining card and update their win %
     def updateCardWinningChance(self):
         suspectSize = len(self.suspects)
@@ -273,6 +303,15 @@ class MainApp(tk.Tk):
 
         for i in range(roomSize):
             self.rooms[i].setChance(int(100 / roomSize))
+
+    #clears all of the selected cards and/or players
+    def clearSelections(self):
+        self.rbVars["suspectVar"].set("")
+        self.rbVars["weaponVar"].set("")
+        self.rbVars["roomVar"].set("")
+
+        for player in self.players:
+            self.playerVars[player.getName()].set(0)
 
     #basic init to create the global variables for the three sets of cards
     def initCards(self):
@@ -292,3 +331,4 @@ if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
 
+#TODO - sort the player cards
