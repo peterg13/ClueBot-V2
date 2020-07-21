@@ -1,4 +1,5 @@
 from .card import Card
+import operator
 
 #class for the players
 class Player:
@@ -18,6 +19,7 @@ class Player:
             newCard = Card(cardName)
             newCard.incrementOccurrence()
             self.cards.append(newCard)
+            self.sortCards()
         else:
             #if the player already has cards then it goes through to see if the new card is already in the list
             #if so it increments the card, otherwise it adds a new one
@@ -26,9 +28,15 @@ class Player:
                 if card.getName() == cardName:
                     card.incrementOccurrence()
                     cardInPlayer = True
+                    self.sortCards()
                     break
             
             if cardInPlayer == False:
                 newCard = Card(cardName)
                 newCard.incrementOccurrence()
                 self.cards.append(newCard)
+                self.sortCards()
+
+    #sorts all the cards on the player by their occurence number from highest to lowest
+    def sortCards(self):
+        self.cards.sort(reverse=True, key=operator.attrgetter('occurrence'))

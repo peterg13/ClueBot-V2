@@ -90,6 +90,7 @@ class MainApp(tk.Tk):
         #button to clear all selections if we need to
         tk.Button(self.buttonFrame, text="Clear", command = lambda : self.clearSelections(), bg="#707070", font=("Helvetica", 25), width = 10).pack(side=tk.LEFT, pady=5, padx=1)
 
+    #LEGACY
     #method that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
     def removeFunction(self):
@@ -136,6 +137,7 @@ class MainApp(tk.Tk):
                     self.rbVars["roomVar"].set("")
                     break
 
+    #LEGACY
     #given the name of the card this fucntion finds the radio button with the same name and removes it from the GUI
     def destroyRadioButton(self, cardType, cardName):
         if cardType == "suspect":
@@ -218,7 +220,7 @@ class MainApp(tk.Tk):
             playerFrame.pack(side = tk.LEFT)
 
             tk.Label(playerFrame, bg=labelBG, text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP, fill="x")
-            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor)
+            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=15)
             playerCardList.pack(side = tk.TOP)
             for card in player.getCards():
                 text = card.getName() + " - " + str(card.getOccurrence())
@@ -244,11 +246,7 @@ class MainApp(tk.Tk):
                 if roomCard != "":
                     player.addCard(roomCard)
 
-                #print("suspect: %s - weapon: %s - room: %s" %(suspectCard, weaponCard, roomCard), flush = True)
                 self.playerVars[player.getName()].set(0)
-                
-                for card in player.getCards():
-                    print(card.getName() + " - " + str(card.getOccurrence()), flush=True)
                 
 
         self.destroyPlayers()
@@ -257,7 +255,8 @@ class MainApp(tk.Tk):
         for var in self.rbVars:
             self.rbVars[var].set("")
 
-    
+    #LEGACY
+    #function called which will handle the gui for the wining card list.  This shows the available cards and their % of being a winning card
     def updateWinningLists(self):
         #side they will align with. Using variable for easy changing later on
         textSide = tk.LEFT
@@ -284,11 +283,13 @@ class MainApp(tk.Tk):
             text = str(room.getChance()) + "% - " + room.getName()
             roomList.insert(tk.END, text)
     
+    #LEGACY
     #simple method to clear the lists before we add the updated ones back
     def destroyWinningLists(self):
         for child in self.resultsFrame.winfo_children():
             child.destroy()
     
+    #LEGACY
     #simple method to loop through each remaining card and update their win %
     def updateCardWinningChance(self):
         suspectSize = len(self.suspects)
@@ -330,5 +331,3 @@ class MainApp(tk.Tk):
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
-
-#TODO - sort the player cards
