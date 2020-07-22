@@ -83,14 +83,20 @@ class MainApp(tk.Tk):
 
     #inits the buttons for removing radio buttons and adding cards to a player  
     def initButtons(self):
-        #button to remove a card (will color it red to indicate that it is eliminated as a possibility)
-        tk.Button(self.buttonFrame, text="REMOVE", command = lambda : self.removeFunction(), bg="#707070", font=("Helvetica", 25), width = 25).pack(side=tk.LEFT, pady=5, padx=1)
-        #button to add the selected card(s) to the selected player(s)
-        tk.Button(self.buttonFrame, text="Add To Player", command = lambda : self.addToPlayer(), bg="#707070", font=("Helvetica", 25), width = 25).pack(side=tk.LEFT, pady=5, padx=1)
-        #button to clear all selections if we need to
-        tk.Button(self.buttonFrame, text="Clear", command = lambda : self.clearSelections(), bg="#707070", font=("Helvetica", 25), width = 10).pack(side=tk.LEFT, pady=5, padx=1)
 
-    #LEGACY
+        buttonBg = "#707070"
+        buttonFont = "Helvetica"
+        buttonFontSize = 25
+
+        #button to remove a card (will color it red to indicate that it is eliminated as a possibility)
+        tk.Button(self.buttonFrame, text="REMOVE", command = lambda : self.removeFunction(), bg=buttonBg, font=(buttonFont, buttonFontSize), width = 20).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to add the selected card(s) to the selected player(s)
+        tk.Button(self.buttonFrame, text="Add To Player", command = lambda : self.addToPlayer(), bg=buttonBg, font=(buttonFont, buttonFontSize), width = 20).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to verify the card on the player (for when you see a specific card on a player)
+        tk.Button(self.buttonFrame, text="Verify", command = lambda : self.verifyCardOnPlayer(), bg=buttonBg, font=(buttonFont, buttonFontSize), width = 10).pack(side=tk.LEFT, pady=5, padx=1)
+        #button to clear all selections if we need to
+        tk.Button(self.buttonFrame, text="Clear", command = lambda : self.clearSelections(), bg=buttonBg, font=(buttonFont, buttonFontSize), width = 10).pack(side=tk.LEFT, pady=5, padx=1)
+
     #method that gets called when the remove button gets click.  This will take the selections from the radio buttons, remove them from our saved
     #list of active cards and update the radiobutton list/chance list
     def removeFunction(self):
@@ -110,11 +116,6 @@ class MainApp(tk.Tk):
                 self.eliminateCard("room", self.rooms[i].getName())
                 self.rooms.pop(i)
                 break
-
-        
-        #self.destroyWinningLists()
-        #self.updateCardWinningChance()
-        #self.updateWinningLists()
 
     #new function to replace the old remove.  Since we no longer want to remove a card we will instead mark it in red to represent that it is eliminated
     def eliminateCard(self, cardType, cardName):
@@ -219,12 +220,20 @@ class MainApp(tk.Tk):
             playerFrame = tk.Frame(self.playersFrame, borderwidth = 3, relief = "solid")
             playerFrame.pack(side = tk.LEFT)
 
+            #label with players name
             tk.Label(playerFrame, bg=labelBG, text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP, fill="x")
-            playerCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=15)
-            playerCardList.pack(side = tk.TOP)
+            #listbox for the players verified cards
+            playerVerifiedCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=3)
+            playerVerifiedCardList.pack(side = tk.TOP)
+            for card in player.getVerifiedCards():
+                text = card.getName() + " - Verified"
+                playerVerifiedCardList.insert(tk.END, text)
+            #listbox for the players possible cards
+            playerPossibleCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=15)
+            playerPossibleCardList.pack(side = tk.TOP)
             for card in player.getCards():
                 text = card.getName() + " - " + str(card.getOccurrence())
-                playerCardList.insert(tk.END, text)
+                playerPossibleCardList.insert(tk.END, text)
 
     #removes the players lists so that we can dispaly it again with updated values
     def destroyPlayers(self):
@@ -305,6 +314,35 @@ class MainApp(tk.Tk):
         for i in range(roomSize):
             self.rooms[i].setChance(int(100 / roomSize))
 
+    #if you see a specific card on a player you can use this function to verify that card on the player.  It will add the card to the players
+    #verified list
+    def verifyCardOnPlayer(self):
+        suspectCard = self.rbVars["suspectVar"].get()
+        weaponCard = self.rbVars["weaponVar"].get()
+        roomCard = self.rbVars["roomVar"].get()
+
+        for player in self.players:
+            if self.playerVars[player.getName()].get() == 1:  
+                if suspectCard != "":
+                    self.eliminateCard("suspect", suspectCard)
+                    player.verifyCard(suspectCard)
+                    self.playerVars[player.getName()].set(0)
+                    break
+                elif weaponCard != "":
+                    self.eliminateCard("weapon", weaponCard)
+                    player.verifyCard(weaponCard)
+                    self.playerVars[player.getName()].set(0)
+                    break
+                elif roomCard != "":
+                    self.eliminateCard("room", roomCard)
+                    player.verifyCard(roomCard)
+                    self.playerVars[player.getName()].set(0)
+                    break
+        
+        self.destroyPlayers()
+        self.updatePlayers()
+        self.clearSelections()
+                
     #clears all of the selected cards and/or players
     def clearSelections(self):
         self.rbVars["suspectVar"].set("")
@@ -331,3 +369,6 @@ class MainApp(tk.Tk):
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
+
+#TODO: When we verify a card it needs to be removed from all other players as well.
+#TODO: Increase width slightly on listboxes
