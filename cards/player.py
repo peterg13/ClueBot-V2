@@ -45,6 +45,12 @@ class Player:
     def sortCards(self):
         self.cards.sort(reverse=True, key=operator.attrgetter('occurrence'))
 
+    def removeCard(self, cardName):
+        for i in range(len(self.cards)):
+            if self.cards[i].getName() == cardName:
+                self.cards.pop(i)
+                break
+
     #when we see that a player has a specific card we verify it.  This is seperate from the regular cards as we know for a fact they have it.
     def verifyCard(self, cardName):
         cardAlreadyVerified = False

@@ -73,10 +73,10 @@ class MainApp(tk.Tk):
 
 
         #------------------------------------------------------------------------------------------------------------
-
+        #LEGACY
         #Frame that will show the possible winning cards along with their percentage for being a winning card
-        self.resultsFrame = tk.Frame(root, bg=self.mainAppBgColor, borderwidth = 5, relief = "solid")
-        self.resultsFrame.pack(side = tk.TOP)
+        #self.resultsFrame = tk.Frame(root, bg=self.mainAppBgColor, borderwidth = 5, relief = "solid")
+        #self.resultsFrame.pack(side = tk.TOP)
 
         #creates the ListBoxes GUI that shows the winning cards
         #self.updateWinningLists()
@@ -212,6 +212,7 @@ class MainApp(tk.Tk):
         listFont = "Helvetica"
         listFontSize = 15
         listFontColor = "#bcc8c9"
+        listWidth = 21
 
 
         #this loop will go through each player added to the game
@@ -223,14 +224,14 @@ class MainApp(tk.Tk):
             #label with players name
             tk.Label(playerFrame, bg=labelBG, text=player.getName(), width = 9, font = (labelFont, labelFontSize)).pack(side=tk.TOP, fill="x")
             #listbox for the players verified cards
-            playerVerifiedCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=3)
-            playerVerifiedCardList.pack(side = tk.TOP)
+            playerVerifiedCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=3, width=listWidth)
+            playerVerifiedCardList.pack(side = tk.TOP, fill="x")
             for card in player.getVerifiedCards():
                 text = card.getName() + " - Verified"
                 playerVerifiedCardList.insert(tk.END, text)
             #listbox for the players possible cards
-            playerPossibleCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=15)
-            playerPossibleCardList.pack(side = tk.TOP)
+            playerPossibleCardList = tk.Listbox(playerFrame, justify = tk.LEFT, font = (listFont, listFontSize), bg=self.mainAppBgColor, fg=listFontColor, height=15, width=listWidth)
+            playerPossibleCardList.pack(side = tk.TOP, fill="x")
             for card in player.getCards():
                 text = card.getName() + " - " + str(card.getOccurrence())
                 playerPossibleCardList.insert(tk.END, text)
@@ -326,23 +327,31 @@ class MainApp(tk.Tk):
                 if suspectCard != "":
                     self.eliminateCard("suspect", suspectCard)
                     player.verifyCard(suspectCard)
+                    self.removeVerifiedCardFromOtherPlayers(suspectCard)
                     self.playerVars[player.getName()].set(0)
                     break
                 elif weaponCard != "":
                     self.eliminateCard("weapon", weaponCard)
                     player.verifyCard(weaponCard)
+                    self.removeVerifiedCardFromOtherPlayers(weaponCard)
                     self.playerVars[player.getName()].set(0)
                     break
                 elif roomCard != "":
                     self.eliminateCard("room", roomCard)
                     player.verifyCard(roomCard)
+                    self.removeVerifiedCardFromOtherPlayers(roomCard)
                     self.playerVars[player.getName()].set(0)
                     break
-        
+    
         self.destroyPlayers()
         self.updatePlayers()
         self.clearSelections()
-                
+
+    #once we verify a card on a player we need to clear that card from all other players since it is no longer a possibilty for them
+    def removeVerifiedCardFromOtherPlayers(self, cardName):
+        for player in self.players:
+            player.removeCard(cardName)
+
     #clears all of the selected cards and/or players
     def clearSelections(self):
         self.rbVars["suspectVar"].set("")
@@ -369,6 +378,3 @@ class MainApp(tk.Tk):
 if __name__ == "__main__":
     app = MainApp()
     app.mainloop()
-
-#TODO: When we verify a card it needs to be removed from all other players as well.
-#TODO: Increase width slightly on listboxes
